@@ -5,13 +5,10 @@ import { db } from '@/database/firebase-init'
 
 Vue.use(Vuex);
 
-
-
 export const store = new Vuex.Store({
     state: {
-        todoList : [],
-       // todoListMap : new Map(),
-        checkedList : []
+        todoList : [], //해야될 일정
+        checkedList : [] //완료된 일정
     },
     getters : {
         todoListMap(state){
@@ -32,8 +29,8 @@ export const store = new Vuex.Store({
             state.checkedList = data;
         },
         addTask(state,data){
-          //state.todoList.set(data.key, data);
              state.todoList.push({key : data.key, value : data});
+             //TODO: state에 저장하기에 task를 추가할때마다 db 연결할 필요가 있을까. 페이지를 벗어날때 변경된 부분을 db update하는 방법 생각할것.
              db.collection("tasks").add(data);
         },
         setRemoveTask(state,key){
@@ -43,19 +40,20 @@ export const store = new Vuex.Store({
                 state.todoList.splice(findIndex,1);
                 //state.checkedList.push(data);
             }
-
-
         },
         addCheckedTask(state,data){
             state.checkedList.push(data);
+            let doc = db.collection("tasks").doc(data.key);
+            doc.update({
+                "checked" : true
+            })
         }
     },
     actions : {
         getTasks({commit}){
             db.collection('tasks').get().then(snap=>{
-                //const testCollection = [];
-                let tasks = [];
-                let checked = [];
+                let tasks = []; //해야될 task
+                let checked = []; //완료된 task
                 snap.forEach(doc => {
                   let obj = { 
                     key : doc.id,
@@ -66,60 +64,11 @@ export const store = new Vuex.Store({
                   }else{
                     tasks.push(obj);
                   }
-                });
-    
+                }); 
                 commit('initTasks',tasks);
                 commit('initcheckedList',checked);
-    
              })
-        //  let data = db.collection('tasks').orderBy('createdDate');
-        //  console.log
         }
         
-        // requestPriceInfo({state}){
-        //     return new Promise((resolve,reject)=>{
-        //         console.log('requestprice');
-        //         resolve('hihiihi');
-        //     })
-        // },
-    //     callBulkPrice({state,commit,dispatch},data){
-
-    //         let resolve, reject, cancelled;
-    //          const promise = new Promise((resolveFromPromise, rejectFromPromise) => {
-    //            resolve = resolveFromPromise;
-    //            reject = rejectFromPromise;
-    //          });
-           
-
-    //    setTimeout(() => {
-    //     dispatch('requestPriceInfo')
-    //     .then(wrapWithCancel('addTask'))
-    //     .then(resolve)
-    //     .then(reject);
-           
-    //    }, 3000);
-     
-       
- 
-    //        return {
-    //          promise,
-    //          cancel: () => {
-    //            cancelled = true;
-    //            reject({ reason: 'cancelled' });
-    //          }
-    //        };
-
-    //        function wrapWithCancel(fn) {
-    //         return (data) => {
-    //           if (!cancelled) {
-    //             return commit(fn,data);
-    //           }else{
-    //               console.log('not commit!!');
-    //           }
-    //         };
-    //       }
-
-          
-    //      }
     }
 });

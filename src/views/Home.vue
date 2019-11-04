@@ -27,6 +27,7 @@ export default {
     checkedList
   },
   created(){
+    console.log('Home creatd');
     this.$store.dispatch('getTasks'); 
         //  let data = db.collection('tasks').get().then(snap=>{
         //     //const testCollection = [];
