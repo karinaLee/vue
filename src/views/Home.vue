@@ -17,7 +17,6 @@
 import taskInputBox from '@/components/taskInputBox.vue'
 import taskList from '@/components/taskList.vue'
 import checkedList from '@/components/checkedList.vue'
-import { db } from '@/database/firebase-init'
 
 export default {
   name: 'home',
@@ -27,28 +26,7 @@ export default {
     checkedList
   },
   created(){
-    console.log('Home creatd');
-    this.$store.dispatch('getTasks'); 
-        //  let data = db.collection('tasks').get().then(snap=>{
-        //     //const testCollection = [];
-        //     let tasks = [];
-        //     let checked = [];
-        //     snap.forEach(doc => {
-        //       let obj = { 
-        //         key : doc.id,
-        //         value : doc.data()
-        //       };
-        //       if(obj.value.checked){
-        //         checked.push(obj);
-        //       }else{
-        //         tasks.push(obj);
-        //       }
-        //     });
-
-        //     this.$store.commit('initTasks',tasks);
-        //     this.$store.commit('initcheckedList',checked);
-
-        //  })
+    this.$store.dispatch('TASK/FETCH_TASKS'); 
   }
 }
 </script>

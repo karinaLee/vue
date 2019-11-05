@@ -48,18 +48,18 @@ export default {
     //      })
     // },
     computed : {
-        ...mapGetters([
-            'todoList', 
+        ...mapGetters({
+           todoList : 'TASK/todoList'
            // 'todoListMap'
         // ...
-        ])
+        })
     },
     methods : {
         toggle(item){
           item.checked = !item.checked;
           if(item.checked){
-            this.$store.commit('setRemoveTask',item.key);
-            this.$store.commit('addCheckedTask',item);
+            this.$store.commit('TASK/REMOVE_TASK',item.key);
+            this.$store.commit('TASK/SET_CHECKED_TASK',item);
           }
           
         }

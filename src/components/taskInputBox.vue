@@ -38,7 +38,7 @@ export default {
                     data : this.task,
                     checked : false
                 }
-                this.$store.commit('addTask',data);
+                this.$store.commit('TASK/SET_TASK',data);
                 this.textclear();
             }
         }

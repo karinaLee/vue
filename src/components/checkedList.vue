@@ -16,9 +16,9 @@ import { mapGetters } from 'vuex'
 export default {
      name: 'checkedList',
      computed : {
-        ...mapGetters([
-            'checkedList'
-        ])
+        ...mapGetters({
+             checkedList : 'TASK/checkedList'
+        })
     }
 }
 </script>
