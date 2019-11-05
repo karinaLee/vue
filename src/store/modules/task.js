@@ -45,17 +45,10 @@ export const TASK = {
         },
         SET_CHECKED_TASK(state,data){
             state.checkedList.push(data);
-            if(state.taskMap.has(data.key)){ 
-                let task = state.taskMap.get(data.key);
-                task.value.checked = true
-                state.taskMap.set(data.key,task);
-            }else{
-                state.taskMap.set(data.key,{
-                    isNew : false, 
-                    value : data.value
-                });
-            }
-
+            state.taskMap.set(data.key,{
+                isNew : (state.taskMap.has(data.key)), 
+                value : data.value
+            });
             console.log([...state.taskMap.entries()]);
            // //
 
