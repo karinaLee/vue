@@ -27,6 +27,11 @@ export default {
   },
   created(){
     this.$store.dispatch('TASK/FETCH_TASKS'); 
+  },
+  deactivated(){
+    console.log('deactivated');
+    this.$store.dispatch('TASK/UPDATE_TASKS'); 
+
   }
 }
 </script>

@@ -4,7 +4,8 @@ export const TASK = {
     namespaced: true,
     state: {
         todoList : [], //해야될 일정
-        checkedList : [] //완료된 일정
+        checkedList : [], //완료된 일정
+        taskMap : new Map() //db 업데이트를 위한 임시 저장소
     },
     getters : {
         todoList(state){
@@ -12,7 +13,8 @@ export const TASK = {
         },
         checkedList(state){
             return state.checkedList;
-        }
+        },
+        taskMap : (state) => state.taskMap 
     },
     mutations : {
         SET_TASKS(state,data){
@@ -23,8 +25,13 @@ export const TASK = {
         },
         SET_TASK(state,data){
              state.todoList.push({key : data.key, value : data});
-             //TODO: state에 저장하기에 task를 추가할때마다 db 연결할 필요가 있을까. 페이지를 벗어날때 변경된 부분을 db update하는 방법 생각할것.
+             state.taskMap.set(data.key,{
+                 isNew : true, //신규 task 여부
+                 value : data
+             });
+             //task 상태 변경시마다 db update 부분을 taskMap에 임시 저장후 deactivated시 일괄 db update로 수정
              //db.collection("tasks").add(data);
+
         },
         REMOVE_TASK(state,key){
 
@@ -33,13 +40,39 @@ export const TASK = {
                 state.todoList.splice(findIndex,1);
                 //state.checkedList.push(data);
             }
+
+
         },
         SET_CHECKED_TASK(state,data){
             state.checkedList.push(data);
-            let doc = db.collection("tasks").doc(data.key);
-            doc.update({
-                "checked" : true
-            })
+            if(state.taskMap.has(data.key)){ 
+                let task = state.taskMap.get(data.key);
+                task.value.checked = true
+                state.taskMap.set(data.key,task);
+            }else{
+                state.taskMap.set(data.key,{
+                    isNew : false, 
+                    value : data.value
+                });
+            }
+
+            console.log([...state.taskMap.entries()]);
+           // //
+
+            // let doc = db.collection("tasks").where("key", "==", data.value.key);
+            // doc.get()
+            // .then(function(querySnapshot) {
+            //     querySnapshot.forEach(function(doc) {
+            //         doc.ref.update({ 'checked': true})
+
+            //         // doc.data() is never undefined for query doc snapshots
+            //         console.log(doc.id, " => ", doc.data());
+            //     });
+            // })
+            // .catch(function(error) {
+            //     console.log("Error getting documents: ", error);
+            // });
+        
         }
     },
     actions : {
@@ -61,6 +94,30 @@ export const TASK = {
                 commit('SET_TASKS',tasks);
                 commit('SET_CHECKED_TASKS',checked);
              })
+        },
+        UPDATE_TASKS({state}){
+
+            if(state.taskMap.size){
+                console.log('db connect')
+                
+                const collect = db.collection("tasks");
+
+                state.taskMap.forEach((data, key) => {
+                    if(data.isNew){
+                        collect.add(data.value);
+                    }else{
+                        collect.doc(key).update({
+                            'checked' : true
+                        })
+                    }
+                })
+
+                state.taskMap.clear();
+
+            }
+
+            
+            
         }
         
     }
