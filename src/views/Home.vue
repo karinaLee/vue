@@ -10,6 +10,8 @@
      </v-content>
     <checkedList/>
 
+    <task-footer></task-footer>
+
   </div>
 </template>
 
@@ -17,13 +19,15 @@
 import taskInputBox from '@/components/taskInputBox.vue'
 import taskList from '@/components/taskList.vue'
 import checkedList from '@/components/checkedList.vue'
+import taskFooter from '@/components/taskFooter.vue'
 
 export default {
   name: 'home',
   components: {
     taskInputBox,
     taskList,
-    checkedList
+    checkedList,
+    taskFooter
   },
   created(){
     this.$store.dispatch('TASK/FETCH_TASKS'); 

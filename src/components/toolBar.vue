@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar :class="{ 'fixed': isFixed }" >
+  <v-toolbar dense fixed app>
     <v-toolbar-title>일일코딩</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-toolbar-items>
@@ -10,34 +10,34 @@
 </template>
 <script>
 export default {
-  data(){
-    return {
-      headerHeight : 0,
-      isFixed : false
-    }
-  },
-  created(){
-    window.addEventListener('scroll', this.checkHeight);
-  },
-  mounted(){
+  // data(){
+  //   return {
+  //     headerHeight : 0,
+  //     isFixed : false
+  //   }
+  // },
+  // created(){
+  //   window.addEventListener('scroll', this.checkHeight);
+  // },
+  // mounted(){
 
-    this.headerHeight = this.$el.offsetHeight;
+  //   this.headerHeight = this.$el.offsetHeight;
 
-  },
-  beforeDestroy() {
-    window.removeEventListener('scroll', this.checkHeight);
-  },
-  methods: {
-    checkHeight() {
-      this.isFixed = (window.scrollY > this.headerHeight) ? true : false;
-    }
-  }
+  // },
+  // beforeDestroy() {
+  //   window.removeEventListener('scroll', this.checkHeight);
+  // },
+  // methods: {
+  //   checkHeight() {
+  //     this.isFixed = (window.scrollY > this.headerHeight) ? true : false;
+  //   }
+  // }
 }
 </script>
 <style scoped>
-.fixed {
+/* .fixed {
   position: fixed;
   width: 100%;
   z-index: 999;
-}
+} */
 </style>

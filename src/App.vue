@@ -2,11 +2,13 @@
   <div id="app">
      <v-app id="inspire">
       <toolBar></toolBar>
-      <transition>
-         <keep-alive> 
-              <router-view></router-view>
-         </keep-alive>
-      </transition>
+      <v-content>
+        <transition>
+          <keep-alive> 
+                <router-view></router-view>
+          </keep-alive>
+        </transition>
+      </v-content>
      </v-app>
   </div>
 </template>

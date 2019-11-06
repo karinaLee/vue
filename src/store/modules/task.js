@@ -26,10 +26,11 @@ export const TASK = {
         SET_TASK(state,data){
              state.todoList.push({key : data.key, value : data});
              state.taskMap.set(data.key,{
-                 isNew : true, //신규 task 여부
+                 state : 'add',
                  value : data
              });
-             //task 상태 변경시마다 db update 부분을 taskMap에 임시 저장후 deactivated시 일괄 db update로 수정
+             //task 상태 변경시마다 db update 부분을 taskMap에 임시 저장후 deactivated시 일괄 db update로 수정...
+             //브라우저 새로고침이나 닫을시.. DB 저장되지않음
              //db.collection("tasks").add(data);
 
         },
@@ -46,26 +47,32 @@ export const TASK = {
         SET_CHECKED_TASK(state,data){
             state.checkedList.push(data);
             state.taskMap.set(data.key,{
-                isNew : (state.taskMap.has(data.key)), 
+                state : (isNaN(data.key)) ? 'update' : 'add', //db key인 경우 string, 임시 key인 경우 timestamp
                 value : data.value
             });
-            console.log([...state.taskMap.entries()]);
-           // //
+            console.log([...state.taskMap.entries()]);        
+        },
+        //완료된 일 전체 삭제
+        DELETE_TASKS(state){
+            state.checkedList.map(task=>{
+                if(state.taskMap.has(task.key)){ //db에 없는 task
+                    if(!isNaN(task.key)){
+                        state.taskMap.delete(task.key)
+                        return;
+                    }
+                }
 
-            // let doc = db.collection("tasks").where("key", "==", data.value.key);
-            // doc.get()
-            // .then(function(querySnapshot) {
-            //     querySnapshot.forEach(function(doc) {
-            //         doc.ref.update({ 'checked': true})
+                state.taskMap.set(task.key,{ //db 삭제해야 될 task
+                    state : 'delete',
+                    value : task.value
+                })
+            });
 
-            //         // doc.data() is never undefined for query doc snapshots
-            //         console.log(doc.id, " => ", doc.data());
-            //     });
-            // })
-            // .catch(function(error) {
-            //     console.log("Error getting documents: ", error);
-            // });
-        
+            state.checkedList = [];
+
+        },
+        CLEAR_TASK_MAP(state){
+            state.taskMap.clear();
         }
     },
     actions : {
@@ -88,24 +95,33 @@ export const TASK = {
                 commit('SET_CHECKED_TASKS',checked);
              })
         },
-        UPDATE_TASKS({state}){
+        UPDATE_TASKS({state, commit}){
 
             if(state.taskMap.size){
-                console.log('db connect')
-                
-                const collect = db.collection("tasks");
 
+                //단일 배치로 일괄 커밋
+                var batch = db.batch();
+                var collect = db.collection("tasks");
                 state.taskMap.forEach((data, key) => {
-                    if(data.isNew){
-                        collect.add(data.value);
-                    }else{
-                        collect.doc(key).update({
-                            'checked' : true
+                    
+                    if(data.state === 'add'){
+                        var task = collect.doc();
+                        batch.set(task,data.value);
+                        return;
+                    }
+
+                    var ref = collect.doc(key);         
+                    if(data.state === 'update'){
+                        batch.update(ref,{
+                            'checked' : !data.value.checked
                         })
+                    }else if(data.state === 'delete'){
+                        batch.delete(ref);
                     }
                 })
 
-                state.taskMap.clear();
+                batch.commit();
+                commit('CLEAR_TASK_MAP');
 
             }
 
