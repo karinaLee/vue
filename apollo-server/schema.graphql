@@ -1,0 +1,17 @@
+"Included scalars"
+scalar JSON
+scalar Upload
+
+
+type Quake {
+  id: ID!
+  magnitude: Float
+  time : String
+  place : String
+}
+
+type Query {
+  "Test query with a parameter"
+  quakes: [Quake]
+ 
+}
