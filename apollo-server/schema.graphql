@@ -1,6 +1,5 @@
 "Included scalars"
 scalar JSON
-scalar Upload
 
 
 type Quake {
@@ -10,8 +9,22 @@ type Quake {
   place : String
 }
 
+type Task {
+  key: ID!
+}
+
+type Todo {
+  task : String,
+  completed : Boolean   
+}
+
 type Query {
   "Test query with a parameter"
   quakes: [Quake]
- 
+  tasks : [Task]
+  todos : [Todo]
+}
+
+type Mutation{
+  addTodo(task: String,completed: Boolean ) : Todo
 }
